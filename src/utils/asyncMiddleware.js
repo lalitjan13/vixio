@@ -1,10 +1,10 @@
 const asyncMiddleware = (handler) => {
-  (req, res, next) => {
+  return (req, res, next) => {
     Promise.resolve(handler(req, res, next)).catch((err) => next(err));
   };
 };
 
-export default asyncMiddleware;
+export { asyncMiddleware };
 
 // const asyncMiddleware = (handler) => {
 //   return async (req, res, next) => {
