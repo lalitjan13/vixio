@@ -82,6 +82,7 @@ const registerUser = asyncMiddleware(async (req, res) => {
 const loginUser = asyncMiddleware(async (req, res) => {
   const { email, username, password } = req.body;
 
+  // if (!username && !email) {
   if (!(username || email)) {
     throw new ApiError(400, "Username or email is required!");
   }
@@ -127,4 +128,27 @@ const loginUser = asyncMiddleware(async (req, res) => {
     );
 });
 
-export { registerUser };
+const logoutUser = asyncMiddleware(async (req, res) => {
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        refreshToken: undefined,
+      },
+    },
+    { new: true }
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+
+  return res
+    .status(200)
+    .clearCookie("accessToken")
+    .clearCookie("refreshToken")
+    .json(new ApiResponse(200, {}, "User logged out Successfully"));
+});
+
+export { registerUser, loginUser, logoutUser };
