@@ -60,6 +60,10 @@ const updateTweet = asyncMiddleware(async (req, res) => {
     throw new ApiError(409, "Tweet not found");
   }
 
+  if (!tweet.owner.equals(req.user._id)) {
+    throw new ApiError(403, "You are not allowed to do this action");
+  }
+
   const updatedTweet = await Tweet.findByIdAndUpdate(
     tweetId,
     { content },
@@ -84,7 +88,11 @@ const deleteTweet = asyncMiddleware(async (req, res) => {
     throw new ApiError(409, "Tweet not found");
   }
 
-  await Tweet.findByIdAndUpdate(tweetId);
+  if (!tweet.owner.equals(req.user._id)) {
+    throw new ApiError(403, "You are not allowed to do this action");
+  }
+
+  await Tweet.findByIdAndDelete(tweetId);
 
   return (
     res.status(200),
